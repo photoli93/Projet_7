@@ -46,6 +46,7 @@ if os.path.exists(pickle_file_path):
         print("Le fichier pickle est vide.")
     else:
         print(f"Le fichier pickle a une taille de {file_size} octets.")
+        print(__name__)
 else:
     print("Le fichier pickle n'existe pas.")
 
