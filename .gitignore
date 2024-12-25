@@ -1,5 +1,2 @@
-# Ignorer tous les fichiers .csv
-*.csv
-
 # Ignorer le dossier data/ et son contenu
 data/
