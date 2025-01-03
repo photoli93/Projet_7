@@ -111,6 +111,77 @@ def predict():
         'prediction_proba': float(prediction_proba[0][1])
     })
 
+import pytest
+import re
+
+# Tests
+@pytest.fixture
+def client():
+    # Créer un client de test (fourni par Flask) pour accéder aux routes
+    with app.test_client() as client:
+        yield client
+
+# Test de la page d'accueil
+# Prends la route principale / de l'application Flask.
+def test_home(client):
+    response = client.get('/') # Effectue une requête HTTP de type GET sur la route /
+    assert response.status_code == 200 # Vérifie que le code de statut HTTP renvoyé par la route / est bien 200, ce qui indique que la requête a été traitée avec succès.
+    assert b"Bienvenue sur la page d'accueil!" in response.data # Vérifie que le contenu de la réponse contient bien la chaîne "Bienvenue sur la page d'accueil!".
+    assert re.search(r'\d+', response.data.decode())  # Vérifie qu'il y a un numéro dans la réponse
+    # assert len(response.data.split()) > 3  # Vérifie qu'un ID de client est inclus
+    
+# Test de la route /predict avec un ID valide
+def test_predict_valid_id(client):
+    valid_client_id = 356810  # ID d'un client dans le dico factice client_data
+    response = client.get(f'/predict?id={valid_client_id}')
+    assert response.status_code == 200
+    data = response.get_json() # Récupère le contenu de la réponse en format JSON, contient un dictionnaire avec comme info : client_id, prediction et predicion_proba
+    assert 'client_id' in data # Vérifie que le champ client_id est bien dans data
+    assert 'prediction' in data
+    assert isinstance(data['prediction'], int) # Vérifie que la valeur dans prediction est bien de type int
+    assert 'prediction_proba' in data 
+    assert isinstance(data['prediction_proba'], float)
+
+# Test de la route /predict avec un ID invalide
+def test_predict_invalid_id(client):
+    invalid_client_id = 567  # ID qui n'existe pas dans le dico factice client_data
+    response = client.get(f'/predict?id={invalid_client_id}')
+    assert response.status_code == 404
+    data = response.get_json()
+    assert 'error' in data
+    assert data['error'] == f'Client ID {invalid_client_id} non trouvé'
+
+# Test de la gestion de l'absence de l'ID dans la requête
+def test_predict_missing_id(client):
+    response = client.get('/predict?id={}')  # ID manquant
+    assert response.status_code == 400  # Vérifie que le statut est 400 (Bad Request)
+    data = response.get_json()
+    assert 'error' in data  # Vérifie que le champ 'error' est présent dans la réponse
+    assert data['error'] == 'Missing client id'  # Vérifie que l'erreur est bien "Missing client id"
+
+# Test de la structure de la réponse JSON
+def test_predict_response_structure(client):
+    valid_client_id = 356810
+    response = client.get(f'/predict?id={valid_client_id}')
+    data = response.get_json()
+    assert 'client_id' in data
+    assert 'prediction' in data
+    assert 'prediction_proba' in data
+    assert isinstance(data['client_id'], int)
+    assert isinstance(data['prediction'], int)
+    assert isinstance(data['prediction_proba'], float)
+
+# Test de performance (vitesse de réponse)
+import time
+
+def test_predict_performance(client):
+    start_time = time.time()
+    valid_client_id = 356810
+    response = client.get(f'/predict?id={valid_client_id}')
+    end_time = time.time()
+    
+    assert response.status_code == 200
+    assert (end_time - start_time) < 1  # Temps de réponse < 1 seconde
 
 if __name__ == '__main__':
     app.run(port=5002, debug=True, use_reloader=False)
