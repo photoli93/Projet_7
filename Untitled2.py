@@ -84,6 +84,13 @@ def predict():
     # Récupérer l'ID du client passé en paramètre de la requête
     client_id = request.args.get('id', type=int)
 
+    # Log pour déboguer
+    print(f"Received client_id: {client_id}")
+
+    # Vérifier si l'ID est manquant
+    if client_id is None:
+        return jsonify({'error': 'Missing client id'}), 400
+
     # Vérifier si l'ID du client existe dans les données
     if client_id not in client_data['num__SK_ID_CURR'].values:
         return jsonify({'error': f'Client ID {client_id} non trouvé'}), 404
@@ -103,6 +110,7 @@ def predict():
         'prediction': int(prediction[0]),
         'prediction_proba': float(prediction_proba[0][1])
     })
+
 
 if __name__ == '__main__':
     app.run(port=5002, debug=True, use_reloader=False)
