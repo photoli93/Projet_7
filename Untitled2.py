@@ -184,4 +184,4 @@ def test_predict_performance(client):
     assert (end_time - start_time) < 1  # Temps de réponse < 1 seconde
 
 if __name__ == '__main__':
-    app.run(port=5002, debug=True, use_reloader=False)
+    app.run(debug=True, use_reloader=False)
