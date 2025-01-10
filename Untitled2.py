@@ -111,8 +111,7 @@ def predict():
         'prediction_proba': float(prediction_proba[0][1])
     })
 
-import pytest
-import re
+#import pytest
 
 # Tests
 @pytest.fixture
