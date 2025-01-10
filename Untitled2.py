@@ -183,4 +183,5 @@ def test_predict_performance(client):
 
 if __name__ == '__main__':
     import pytest
+    import re
     app.run(port=5002, debug=True, use_reloader=False)
