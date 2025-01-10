@@ -110,7 +110,9 @@ def predict():
         'prediction': int(prediction[0]),
         'prediction_proba': float(prediction_proba[0][1])
     })
-
+    
+import pytest
+import re
 
 # Tests
 @pytest.fixture
@@ -182,6 +184,4 @@ def test_predict_performance(client):
     assert (end_time - start_time) < 1  # Temps de réponse < 1 seconde
 
 if __name__ == '__main__':
-    import pytest
-    import re
     app.run(port=5002, debug=True, use_reloader=False)
